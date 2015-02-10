@@ -8,12 +8,6 @@ import java.util.*;
 
 import com.google.gson.Gson;
 
-import org.scribe.builder.*;
-import org.scribe.builder.api.*;
-import org.scribe.model.*;
-import org.scribe.oauth.*;
-import org.scribe.exceptions.*;
-
 import java.net.URL;
 import java.net.URI;
 import java.net.MalformedURLException;
@@ -38,18 +32,13 @@ import org.apache.log4j.Logger;
 
 public class DiscogsCoreService
 {
-    private Map<String, List<Integer>> api_properties;
-    private OAuthService oa_service;
+    //TODO: support discogs API limit properties
+    private Map<String, String> api_limits;
     private DefaultHttpClient default_client;
     private Properties properties;
-    private String auth_url;
-    private Token access_token;
-    private Token request_token;
     private Gson gson;
-    private String oauth_init_error;
 
     private static final Logger log = Logger.getLogger(DiscogsCoreService.class);
-
 
     public DiscogsCoreService()
     {
@@ -57,12 +46,18 @@ public class DiscogsCoreService
 	
 	log.info("Loading properties...");
 	loadProperties();
+
+	this.default_client = new DefaultHttpClient();
+	this.default_client.getParams().setParameter(CoreProtocolPNames.USER_AGENT, DiscogsCommons.USER_AGENT);
+    }
+
+    public DiscogsCoreService(Properties properties)
+    {
+	this.gson = new Gson();
+	this.properties = properties;
+	this.default_client = new DefaultHttpClient();
+	this.default_client.getParams().setParameter(CoreProtocolPNames.USER_AGENT, DiscogsCommons.USER_AGENT);
 	
-	log.info("Preauthorization...");
-	preAuthorize();
-	
-	if(log.isInfoEnabled())
-	    log.info("Auth URL:" + getAuthURL());
     }
 
     private void loadProperties()
@@ -94,71 +89,6 @@ public class DiscogsCoreService
    	   this.properties.setProperty(DiscogsCommons.USER_URL, 
                                 "http://api.discogs.com/users/");
        }
-    }
-
-    private void preAuthorize()
-    {
-	try
-	{
-	    initOAuth();
-	}
-	catch(OAuthException e)
-	{
-	    log.error(e);
-	    this.oauth_init_error = e.getMessage();
-	}
-	finally
-	{
-	    initDefaultClient();
-	}
-    }
-
-    private void initOAuth()
-    {
-	if(this.oa_service == null
-	   && !StringUtils.isEmpty(this.properties.getProperty(DiscogsCommons.CONSUMER_KEY))
-	   && !StringUtils.isEmpty(this.properties.getProperty(DiscogsCommons.SECRET_KEY)))
-	{
-	    this.oa_service = new ServiceBuilder().provider(DiscoApiEnvelope.class)
-		                  .apiKey(this.properties.getProperty(DiscogsCommons.CONSUMER_KEY))
-                                  .apiSecret(this.properties.getProperty(DiscogsCommons.SECRET_KEY))
-                                  .build();
-
-	    this.request_token = this.oa_service.getRequestToken();
-	    this.auth_url = this.oa_service.getAuthorizationUrl(this.request_token);
-	}
-    }
-
-    private void initDefaultClient()
-    {
-	if(this.default_client == null)
-	{
-	    this.default_client = new DefaultHttpClient();
-	    this.default_client.getParams().setParameter(CoreProtocolPNames.USER_AGENT, DiscogsCommons.USER_AGENT);
-	}
-    }
-
-    public String getOuathInitErrorMessage()
-    {
-	return this.oauth_init_error;
-    }
-
-    public void authorize(String sequence)
-    {
-	Verifier verifier = new Verifier(sequence);
-	if(this.oa_service != null)
-	    this.access_token = this.oa_service.getAccessToken(this.request_token, verifier);
-    }
-
-    public String getAuthURL()
-    {
-	initOAuth();
-	return this.auth_url;
-    }
-
-    public boolean isAuthorized()
-    {
-	return access_token != null;
     }
 
     protected <T extends DiscogsEntity> T getEntity(String id, Class<T> type)
@@ -220,47 +150,12 @@ public class DiscogsCoreService
 	    log.debug(logResults.toString());
 	}
 
-
 	return resultList;
     }
 
-    private InputStream sendRequest(String destination, Map<String, String> parameters)
+    protected InputStream sendRequest(String destination, Map<String, String> parameters)
 	    throws DiscogsApiException
     {
-	return isAuthorized() ? sendOAuthRequest(destination, parameters)
-	                      : sendDefaultRequest(destination, parameters);
-    }
-
-    private InputStream sendOAuthRequest(String destination, Map<String, String> parameters)
-	   throws DiscogsApiException
-    {
-	
-	log.info("send OAuth request.");
-	
-	OAuthRequest request = new OAuthRequest(Verb.GET, destination);
-	//	    request.setConnectionKeepAlive(true);
-	request.addHeader(CoreProtocolPNames.USER_AGENT, DiscogsCommons.USER_AGENT);
-	if(parameters != null && !parameters.isEmpty())
-	{
-	    for(String key : parameters.keySet())
-	    {
-		if(key == null) continue;
-		if(parameters.get(key) == null) continue;
-		request.addQuerystringParameter(key, parameters.get(key));
-	    }
-	}
-	
-	this.oa_service.signRequest(this.access_token, request);
-	Response response = request.send();
-
-	DiscogsCommons.validateResponse(response.getCode());
-
-	return response.getStream();
-    }
-
-    private InputStream sendDefaultRequest(String destination, Map<String, String> parameters) 
-	    throws DiscogsApiException
-    {	
 	try
 	{
 	    log.info("Send Default request.");
@@ -315,5 +210,10 @@ public class DiscogsCoreService
 	}
 	
 	return StringUtils.EMPTY;
+    }
+
+    public Map<String, String> getAPILimits()
+    {
+	return this.api_limits;
     }
 }

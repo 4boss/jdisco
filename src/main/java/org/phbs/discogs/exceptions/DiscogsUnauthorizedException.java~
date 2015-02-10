@@ -1,6 +1,0 @@
-package org.phbs.metag.discogs.exceptions;
-
-class DiscogsUnauthorizedException extends DiscogsApiException
-{
-
-}

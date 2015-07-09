@@ -35,8 +35,8 @@ public class DiscogsCoreService
     //TODO: support discogs API limit properties
     private Map<String, String> api_limits;
     private DefaultHttpClient default_client;
-    private Properties properties;
-    private Gson gson;
+    protected Properties properties;
+    protected Gson gson;
 
     private static final Logger log = Logger.getLogger(DiscogsCoreService.class);
 
@@ -115,44 +115,6 @@ public class DiscogsCoreService
 	return entity;
     }
 
-    protected <T extends DiscogsEntity> List<T> findEntity(Map<String, String> parameters, Class<T> type, Type typeToken)
-	throws DiscogsApiException
-    {
-	DiscogsSearchResult<T> result = null;
-	try(InputStream stream = sendRequest(getEndpoint(DiscogsSearchResult.class), parameters);
-	    Reader inReader = new BufferedReader(new InputStreamReader(stream));)
-        {
-	    result = this.gson.fromJson(inReader, typeToken);
-	}
-	catch(IOException e)
-        {
-	    throw new DiscogsApiException("Error during sending request. ",e);
-	}
-	
-	List<T> resultList = Collections.emptyList();
-	if(result.getResults() != null)
-	    resultList = Arrays.asList(result.getResults());
-
-	if(log.isDebugEnabled())
-	{
-	    StringBuilder logResults = new StringBuilder("Found ");
-	    logResults.append(resultList.size())
-		.append(" entities ")
-		.append(type.getName())
-		.append(" by params:\n")
-		.append(StringUtils.join(parameters.entrySet(), "\n"))
-		.append("Results: \n");
-	    for(T entity : resultList)
-	    {
-		logResults.append(entity.toString()).append("\n");
-	    }
-
-	    log.debug(logResults.toString());
-	}
-
-	return resultList;
-    }
-
     protected InputStream sendRequest(String destination, Map<String, String> parameters)
 	    throws DiscogsApiException
     {
@@ -186,7 +148,7 @@ public class DiscogsCoreService
 	}
     }
 
-    private <T> String getEndpoint(Class<T> type)
+    protected <T> String getEndpoint(Class<T> type)
     {
 	if(log.isDebugEnabled())
 	    log.debug("Find endpoint by type " + type.getSimpleName());

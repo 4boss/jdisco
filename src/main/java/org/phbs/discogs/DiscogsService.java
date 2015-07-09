@@ -15,22 +15,22 @@ public class DiscogsService extends DiscogsCoreService
 	super();
     }
     
-    public DiscogsArtist getArtist(int id) throws DiscogsApiException
+    public DiscogsArtist getArtist(long id) throws DiscogsApiException
     {
 	return getEntity(id+"", DiscogsArtist.class);
     }
 
-    public DiscogsRelease getRelease(int id) throws DiscogsApiException
+    public DiscogsRelease getRelease(long id) throws DiscogsApiException
     {
 	return getEntity(id+"", DiscogsRelease.class);
     }
     
-    public DiscogsMasterRelease getMaster(int id) throws DiscogsApiException
+    public DiscogsMasterRelease getMaster(long id) throws DiscogsApiException
     {
 	return getEntity(id+"", DiscogsMasterRelease.class);
     }
 
-    public DiscogsLabel getLabel(int id) throws DiscogsApiException
+    public DiscogsLabel getLabel(long id) throws DiscogsApiException
     {
 	return getEntity(id+"", DiscogsLabel.class);
     }
@@ -38,24 +38,5 @@ public class DiscogsService extends DiscogsCoreService
     public DiscogsUser getUser(String name) throws DiscogsApiException
     {
 	return getEntity(name, DiscogsUser.class);	
-    }
-    
-    public DiscogsImage getImage(String name) throws DiscogsApiException
-    {
-	return null;
-    }
-
-    public DiscogsImage getImage(DiscogsImage image) throws DiscogsApiException
-    {
-	return image;
-    }
-
-    public List<DiscogsArtist> findArtists(String name) throws DiscogsApiException
-    {
-	Map<String, String> params = new HashMap<>();
-	params.put("type", "artist");
-	params.put("title", name);
-	TypeToken typeToken = new TypeToken<DiscogsSearchResult<DiscogsArtist>>(){};
-	return findEntity(params, DiscogsArtist.class, typeToken.getType());
     }
 }

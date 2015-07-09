@@ -6,7 +6,7 @@ public class DiscogsUser extends DiscogsEntity
     private String wantlist_url;
     private String rank;
     private int num_pending;
-    private int id;
+    private long id;
     private int num_for_sale;
     private String home_page;
     private String location;
@@ -54,7 +54,7 @@ public class DiscogsUser extends DiscogsEntity
 	return this.num_pending;
     }
 
-    public int getId()
+    public long getId()
     {
 	return this.id;
     }
@@ -164,7 +164,7 @@ public class DiscogsUser extends DiscogsEntity
 	this.num_pending = num_pending;
     }
 
-    public void setId(int id)
+    public void setId(long id)
     {
 	this.id = id;
     }

@@ -1,10 +1,11 @@
 package org.phbs.discogs.pojo;
 
 import org.apache.commons.lang.StringUtils;
+import java.util.List;
 
 public class DiscogsArtist extends DiscogsEntity
 {
-    private int id;
+    private long id;
     private String name;
     private String resource_url;
     private String releases_url;
@@ -12,15 +13,17 @@ public class DiscogsArtist extends DiscogsEntity
     private String realname;
     private String profile;
     private String data_quality;
-    private String[] namevariations;
-    private String[] urls;
-    private DiscogsImage[] images;
+    private List<String> namevariations;
+    private List<String> urls;
+    private List<DiscogsImage> images;
+    private List<DiscogsArtist> members;
+    private Boolean active;
 
     public DiscogsArtist()
     {
     }
 
-    public int getId()
+    public long getId()
     {
 	return this.id;
     }
@@ -65,22 +68,32 @@ public class DiscogsArtist extends DiscogsEntity
 	return this.data_quality;
     }
 
-    public String[] getNameVariations()
+    public List<String> getNameVariations()
     {
 	return this.namevariations;
     }
 
-    public String[] getUrls()
+    public List<String> getUrls()
     {
 	return this.urls;
     }
 
-    public DiscogsImage[] getImages()
+    public List<DiscogsImage> getImages()
     {
 	return this.images;
     }
 
-    public void setId(int id)
+    public List<DiscogsArtist> getMembers()
+    {
+	return this.members;
+    }
+
+    public Boolean getActive()
+    {
+	return this.active;
+    }
+
+    public void setId(long id)
     {
 	this.id = id;
     }
@@ -120,19 +133,29 @@ public class DiscogsArtist extends DiscogsEntity
 	this.data_quality = data_quality;
     }
 
-    public void setNameVariations(String[] namevariations)
+    public void setNameVariations(List<String> namevariations)
     {
 	this.namevariations = namevariations;
     }
 
-    public void setUrls(String[] urls)
+    public void setUrls(List<String> urls)
     {
 	this.urls = urls;
     }
 
-    public void setImages(DiscogsImage[] images)
+    public void setImages(List<DiscogsImage> images)
     {
 	this.images = images;
+    }
+
+    public void setMembers(List<DiscogsArtist> members)
+    {
+	this.members = members;
+    }
+
+    public void setActive(Boolean active)
+    {
+	this.active = active;
     }
 
     public String toString()
@@ -149,6 +172,7 @@ public class DiscogsArtist extends DiscogsEntity
 	    .append("NameVariations: ").append(StringUtils.join(getNameVariations(),',')).append("\n")
 	    .append("Urls: ").append(StringUtils.join(getUrls(),',')).append("\n")
 	    .append("Images: ").append(StringUtils.join(getImages(),"\n")).append("\n")
+	    .append("Members: ").append(StringUtils.join(getMembers(),"\n")).append("\n")
 	    .append("###########################");
 
 	return builder.toString();

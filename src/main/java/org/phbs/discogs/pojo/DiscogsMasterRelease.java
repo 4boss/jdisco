@@ -1,10 +1,11 @@
 package org.phbs.discogs.pojo;
 
 import org.apache.commons.lang.StringUtils;
+import java.util.List;
 
 public class DiscogsMasterRelease extends DiscogsEntity
 {
-    private int id;
+    private long id;
     private String title;
     private String resource_url;
     private String versions_url;
@@ -12,18 +13,18 @@ public class DiscogsMasterRelease extends DiscogsEntity
     private int main_release;
     private String main_release_url;
     private short year;
-    private String[] styles;
-    private String[] genres;
+    private List<String> styles;
+    private List<String> genres;
     private String data_quality;
-    private DiscogsVideo[] videos;
-    private DiscogsArtist[] artists;
-    private DiscogsImage[] images;
-    private DiscogsTrack[] tracklist;
+    private List<DiscogsArtist> artists;
+    private List<DiscogsImage> images;
+    private List<DiscogsTrack> tracklist;
+    private List<DiscogsVideo> videos;
 
     public DiscogsMasterRelease()
     {}
 
-    public int getId()
+    public long getId()
     {
 	return this.id;
     }
@@ -68,12 +69,12 @@ public class DiscogsMasterRelease extends DiscogsEntity
 	return this.year;
     }
 
-    public String[] getStyles()
+    public List<String> getStyles()
     {
 	return this.styles;
     }
 
-    public String[] getGenres()
+    public List<String> getGenres()
     {
 	return this.genres;
     }
@@ -82,28 +83,28 @@ public class DiscogsMasterRelease extends DiscogsEntity
     {
 	return this.data_quality;
     }
-
-    public DiscogsVideo[] getVideos()
-    {
-	return this.videos;
-    }
     
-    public DiscogsArtist[] getArtists()
+    public List<DiscogsArtist> getArtists()
     {
 	return this.artists;
     }
 
-    public DiscogsImage[] getImages()
+    public List<DiscogsImage> getImages()
     {
 	return this.images;
     }
     
-    public DiscogsTrack[] getTracklist()
+    public List<DiscogsTrack> getTracklist()
     {
 	return this.tracklist;
     }
 
-    public void setId(int id)
+    public List<DiscogsVideo> getVideos()
+    {
+	return this.videos;
+    }
+
+    public void setId(long id)
     {
 	this.id = id;
     }
@@ -143,12 +144,12 @@ public class DiscogsMasterRelease extends DiscogsEntity
 	this.year = year;
     }
 
-    public void setStyles(String[] styles)
+    public void setStyles(List<String> styles)
     {
 	this.styles = styles;
     }
 
-    public void setGenres(String[] genres)
+    public void setGenres(List<String> genres)
     {
 	this.genres = genres;
     }
@@ -157,25 +158,25 @@ public class DiscogsMasterRelease extends DiscogsEntity
     {
 	this.data_quality = data_quality;
     }
-
-    public void setDiscogsVideos(DiscogsVideo[] videos)
-    {
-	this.videos = videos;
-    }
     
-    public void setArtists(DiscogsArtist[] artists)
+    public void setArtists(List<DiscogsArtist> artists)
     {
 	this.artists = artists;
     }
 
-    public void setImages(DiscogsImage[] images)
+    public void setImages(List<DiscogsImage> images)
     {
 	this.images = images;
     }
     
-    public void setTracklist(DiscogsTrack[] tracklist)
+    public void setTracklist(List<DiscogsTrack> tracklist)
     {
 	this.tracklist = tracklist;
+    }
+
+    public void setVideos(List<DiscogsVideo> videos)
+    {
+	this.videos = videos;
     }
 
     public String toString()
@@ -194,8 +195,8 @@ public class DiscogsMasterRelease extends DiscogsEntity
 	    .append("Genres: ").append(StringUtils.join(getGenres(),',')).append("\n")
 	    .append("Artists: \n").append(StringUtils.join(getArtists(), "\n")).append("\n")
 	    .append("Images: \n").append(StringUtils.join(getImages(), "\n")).append("\n")
-	    .append("Videos: \n").append(StringUtils.join(getVideos(), "\n")).append("\n")
 	    .append("Tracklist: \n").append(StringUtils.join(getTracklist(), "\n")).append("\n")
+	    .append("Videos: \n").append(StringUtils.join(getVideos(), "\n")).append("\n")
 	    .append("#############################");
 	
 	return builder.toString();
@@ -206,9 +207,20 @@ public class DiscogsMasterRelease extends DiscogsEntity
 	private String duration;
 	private String position;
 	private String title;
+	private String type_;
 
 	public DiscogsTrack()
 	{}
+
+	public String getType_()
+	{
+	    return this.type_;
+	}
+
+	public void setType_(String type_)
+	{
+	    this.type_ = type_;
+	}
 
 	public String getDuration()
 	{
@@ -230,7 +242,7 @@ public class DiscogsMasterRelease extends DiscogsEntity
 	    this.duration = duration;
 	}
 
-	public void setPosistion(String position)
+	public void setPosition(String position)
 	{
 	    this.position = position;
 	}

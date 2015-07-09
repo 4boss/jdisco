@@ -8,10 +8,15 @@ import org.scribe.exceptions.*;
 import java.util.*;
 
 import org.phbs.discogs.exceptions.*;
+import org.phbs.discogs.pojo.*;
 import java.io.*;
+import java.lang.reflect.Type;
 import org.apache.http.params.CoreProtocolPNames;
+import org.apache.commons.lang.StringUtils;
 
 import org.apache.log4j.Logger;
+
+import com.google.gson.reflect.TypeToken;
 
 public class DiscogsOAuthService extends DiscogsCoreService {
 
@@ -100,5 +105,82 @@ public class DiscogsOAuthService extends DiscogsCoreService {
 	DiscogsCommons.validateResponse(response.getCode());
 
 	return response.getStream();
+    }
+
+    private <T extends DiscogsEntity> List<T> findEntity(Map<String, String> parameters, Class<T> type, Type typeToken)
+	throws DiscogsApiException
+    {
+	DiscogsSearchResult<T> result = null;
+	try(InputStream stream = sendRequest(getEndpoint(DiscogsSearchResult.class), parameters);
+	    Reader inReader = new BufferedReader(new InputStreamReader(stream));)
+        {
+	    result = this.gson.fromJson(inReader, typeToken);
+	}
+	catch(IOException e)
+        {
+	    throw new DiscogsApiException("Error during sending request. ",e);
+	}
+	
+	List<T> resultList = Collections.emptyList();
+	if(result.getResults() != null)
+	    resultList = result.getResults();
+
+	if(log.isDebugEnabled())
+	{
+	    StringBuilder logResults = new StringBuilder("Found ");
+	    logResults.append(resultList.size())
+		.append(" entities ")
+		.append(type.getName())
+		.append(" by params:\n")
+		.append(StringUtils.join(parameters.entrySet(), "\n"))
+		.append("Results: \n");
+	    for(T entity : resultList)
+	    {
+		logResults.append(entity.toString()).append("\n");
+	    }
+
+	    log.debug(logResults.toString());
+	}
+
+	return resultList;
+    }
+
+    public List<DiscogsArtist> findArtists(String name) throws DiscogsApiException
+    {
+	Map<String, String> params = new HashMap<>();
+	params.put("type", "artist");
+	params.put("title", name);
+	TypeToken typeToken = new TypeToken<DiscogsSearchResult<DiscogsArtist>>(){};
+	return findEntity(params, DiscogsArtist.class, typeToken.getType());
+    }
+
+    public List<DiscogsRelease> findReleases(String name) throws DiscogsApiException
+    {
+	Map<String, String> params = new HashMap<>();
+	params.put("type", "release");
+	params.put("title", name);
+	TypeToken typeToken = new TypeToken<DiscogsSearchResult<DiscogsRelease>>(){};
+	return findEntity(params, DiscogsRelease.class, typeToken.getType());
+    }
+
+    public List<DiscogsLabel> findLabels(String name) throws DiscogsApiException
+    {
+	Map<String, String> params = new HashMap<>();
+	params.put("type", "label");
+	params.put("title", name);
+	TypeToken typeToken = new TypeToken<DiscogsSearchResult<DiscogsLabel>>(){};
+	return findEntity(params, DiscogsLabel.class, typeToken.getType());
+    }
+
+    public DiscogsImage getImage(String name) throws DiscogsApiException
+    {
+	//TODO impl
+	return null;
+    }
+
+    public DiscogsImage getImage(DiscogsImage image) throws DiscogsApiException
+    {
+	//TODO IMPL
+	return image;
     }
 }

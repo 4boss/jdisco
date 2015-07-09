@@ -1,9 +1,12 @@
 package org.phbs.discogs.pojo;
+
+import java.util.List;
+
 public class DiscogsSearchResult<T extends DiscogsEntity>
 {
     
     private SearchPagination pagination;
-    private T [] results;
+    private List<T> results;
 
     public DiscogsSearchResult()
     {}
@@ -13,7 +16,7 @@ public class DiscogsSearchResult<T extends DiscogsEntity>
 	return this.pagination;
     }
 
-    public T [] getResults()
+    public List<T> getResults()
     {
 	return this.results;
     }
@@ -23,7 +26,7 @@ public class DiscogsSearchResult<T extends DiscogsEntity>
 	this.pagination = pagination;
     }
 
-    public void setResults(T [] results)
+    public void setResults(List<T> results)
     {
 	this.results = results;
     }

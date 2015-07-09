@@ -1,9 +1,11 @@
 package org.phbs.discogs.pojo;
+
 import org.apache.commons.lang.StringUtils;
+import java.util.List;
 
 public class DiscogsLabel extends DiscogsEntity
 {
-    private int id;
+    private long id;
     private String name;
     private String profile;
     private String resource_url;
@@ -11,15 +13,14 @@ public class DiscogsLabel extends DiscogsEntity
     private String uri;
     private String data_quality;
     private String contact_info;
-    private DiscogsLabel parent_label;
-    private DiscogsLabel[] sublabels;
-    private String[] urls;
-    private DiscogsImage[] images;
+    private List<DiscogsLabel> sublabels;
+    private List<String> urls;
+    private List<DiscogsImage> images;
 
     public DiscogsLabel()
     {}
     
-    public int getId()
+    public long getId()
     {
 	return this.id;
     }
@@ -64,27 +65,22 @@ public class DiscogsLabel extends DiscogsEntity
 	return this.contact_info;
     }
 
-    public DiscogsLabel getParentLabel()
-    {
-	return this.parent_label;
-    }
-
-    public DiscogsLabel[] getSublabels()
+    public List<DiscogsLabel> getSublabels()
     {
 	return this.sublabels;
     }
     
-    public String[] getUrls()
+    public List<String> getUrls()
     {
 	return this.urls;
     }
 
-    public DiscogsImage[] getImages()
+    public List<DiscogsImage> getImages()
     {
 	return this.images;
     }
     
-    public void setId(int id)
+    public void setId(long id)
     {
 	this.id = id;
     }
@@ -124,22 +120,17 @@ public class DiscogsLabel extends DiscogsEntity
 	this.contact_info = contact_info;
     }
 
-    public void setParentLabel(DiscogsLabel parent_label)
-    {
-	this.parent_label = parent_label;
-    }
-
-    public void setSublabels(DiscogsLabel[] sublabels)
+    public void setSublabels(List<DiscogsLabel> sublabels)
     {
 	this.sublabels = sublabels;
     }
     
-    public void setUrls(String[] urls)
+    public void setUrls(List<String> urls)
     {
 	this.urls = urls;
     }
 
-    public void setImages(DiscogsImage[] images)
+    public void setImages(List<DiscogsImage> images)
     {
 	this.images = images;
     }
@@ -155,7 +146,6 @@ public class DiscogsLabel extends DiscogsEntity
 	    .append("Uri: ").append(getUri()).append("\n")
 	    .append("DataQuality: ").append(getDataQuality()).append("\n")
 	    .append("ContactInfo: ").append(getContactInfo()).append("\n")
-	    .append("ParentLabel: ").append(getParentLabel()).append("\n")
 	    .append("Sublabels: ").append(StringUtils.join(getSublabels(), "\n")).append("\n")
 	    .append("Urls: ").append(StringUtils.join(getUrls(),"\n")).append("\n")
 	    .append("Images: ").append(StringUtils.join(getImages(), "\n")).append("\n")

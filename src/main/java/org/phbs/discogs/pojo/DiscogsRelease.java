@@ -1,34 +1,58 @@
 package org.phbs.discogs.pojo;
 
 import org.apache.commons.lang.StringUtils;
+import java.util.List;
+import org.phbs.discogs.pojo.DiscogsMasterRelease.DiscogsTrack;
+import org.phbs.discogs.pojo.DiscogsMasterRelease.DiscogsVideo;
 
-public class DiscogsRelease extends DiscogsMasterRelease
+public class DiscogsRelease extends DiscogsEntity
 {
+    private long id;
+    private short year;
+    private List<String> styles;
+    private List<String> genres;
+    private List<DiscogsArtist> artists;
+    private List<DiscogsImage> images;
+    private List<DiscogsTrack> tracklist;
+    private short format_quantity;
+    private String title;
+    private String date_added;
+    private String data_quality;
+    private short estimated_weight;
+    private String resource_url;
+    private String uri;
+    private String date_changed;
+    private String thumb;
+    private List<String> series;
     private String status;
-    private int master_id;
-    private String master_url;
+    private List<DiscogsVideo> videos;
     private String country;
     private String released;
     private String released_formatted;
     private String notes;
     private DiscogsCommunity community;
-    private DiscogsUser submitter;
-    private DiscogsUser[] contributors;
-    private DiscogsLabel[] labels;
-    private DiscogsLabel[] companies;
-    private DiscogsArtist[] extraartists;
-    private DiscogsFormat[] formats;
-    private DiscogsIdentifier[] identifiers;
+    private List<DiscogsLabel> labels;
+    private List<DiscogsLabel> companies;
+    private List<DiscogsArtist> extraartists;
+    private List<DiscogsFormat> formats;
+    private List<DiscogsIdentifier> identifiers;
+    private long master_id;
+    private String master_url;
     
     public DiscogsRelease()
     {}
 
-    public String getStatus()
+    public long getId()
     {
-	return this.status;
+	return this.id;
     }
 
-    public int getMasterId()
+    protected String getID()
+    {
+	return getId() + "";
+    }
+
+    public long getMasterId()
     {
 	return this.master_id;
     }
@@ -36,6 +60,91 @@ public class DiscogsRelease extends DiscogsMasterRelease
     public String getMasterUrl()
     {
 	return this.master_url;
+    }
+
+    public List<String> getStyles()
+    {
+	return this.styles;
+    }
+
+    public List<String> getGenres()
+    {
+	return this.genres;
+    }
+
+    public List<DiscogsArtist> getArtists()
+    {
+	return this.artists;
+    }
+
+    public List<DiscogsImage> getImages()
+    {
+	return this.images;
+    }
+
+    public List<DiscogsTrack> getTracklist()
+    {
+	return this.tracklist;
+    }
+
+    public short getFormatQuantity()
+    {
+	return this.format_quantity;
+    }
+
+    public String getTitle()
+    {
+	return this.title;
+    }
+
+    public String getDateAdded()
+    {
+	return this.date_added;
+    }
+
+    public short getEstimatedWeight()
+    {
+	return this.estimated_weight;
+    }
+
+    public String getResourceUrl()
+    {
+	return this.resource_url;
+    }
+
+    public String getUri()
+    {
+	return this.uri;
+    }
+
+    public String getDateChanged()
+    {
+	return this.date_changed;
+    }
+
+    public String getThumb()
+    {
+	return this.thumb;
+    }
+
+    public List<String> getSeries()
+    {
+	return this.series;
+    }
+
+    public short getYear()
+    {
+	return this.year;
+    }
+
+    public List<DiscogsVideo> getVideos()
+    {
+	return this.videos;
+    }
+
+    public String getStatus()
+    {
+	return this.status;
     }
 
     public String getCountry()
@@ -52,6 +161,11 @@ public class DiscogsRelease extends DiscogsMasterRelease
     {
 	return this.released_formatted;
     }
+
+    public String getDataQuality()
+    {
+	return this.data_quality;
+    }
     
     public String getNotes()
     {
@@ -63,47 +177,37 @@ public class DiscogsRelease extends DiscogsMasterRelease
 	return this.community;
     }
 
-    public DiscogsUser getSubmitter()
-    {
-	return this.submitter;
-    }
-
-    public DiscogsUser[] getContributors()
-    {
-	return this.contributors;
-    }
-
-    public DiscogsLabel[] getLabels()
+    public List<DiscogsLabel> getLabels()
     {
 	return this.labels;
     }
 
-    public DiscogsLabel[] getCompanies()
+    public List<DiscogsLabel> getCompanies()
     {
 	return this.companies;
     }
 
-    public DiscogsArtist[] getExtraArtists()
+    public List<DiscogsArtist> getExtraArtists()
     {
 	return this.extraartists;
     }
 
-    public DiscogsFormat[] getFormats()
+    public List<DiscogsFormat> getFormats()
     {
 	return this.formats;
     }
 
-    public DiscogsIdentifier[] getIdentifiers()
+    public List<DiscogsIdentifier> getIdentifiers()
     {
 	return this.identifiers;
     }
-    
-    public void setStatus(String status)
+
+    public void setId(long id)
     {
-	this.status = status;
+	this.id = id;
     }
 
-    public void setMasterId(int master_id)
+    public void setMasterId(long master_id)
     {
 	this.master_id = master_id;
     }
@@ -111,6 +215,91 @@ public class DiscogsRelease extends DiscogsMasterRelease
     public void setMasterUrl(String master_url)
     {
 	this.master_url = master_url;
+    }
+
+    public void setStyles(List<String> styles)
+    {
+	this.styles = styles;
+    }
+
+    public void setGenres(List<String> genres)
+    {
+	this.genres = genres;
+    }
+
+    public void setImages(List<DiscogsImage> images)
+    {
+	this.images = images;
+    }
+
+    public void setTracklist(List<DiscogsTrack> tracklist)
+    {
+	this.tracklist = tracklist;
+    }
+
+    public void setFormatQuantity(short format_quantity)
+    {
+	this.format_quantity = format_quantity;
+    }
+
+    public void setTitle(String title)
+    {
+	this.title = title;
+    }
+
+    public void setDateAdded(String date_added)
+    {
+	this.date_added = date_added;
+    }
+
+    public void setEstimatedWeight(short estimated_weight)
+    {
+	this.estimated_weight = estimated_weight;
+    }
+
+    public void setResourceUrl(String resource_url)
+    {
+	this.resource_url = resource_url;
+    }
+
+    public void setUri(String uri)
+    {
+	this.uri = uri;
+    }
+
+    public void setDateChanged(String date_changed)
+    {
+	this.date_changed = date_changed;
+    }
+
+    public void setThumb(String thumb)
+    {
+	this.thumb = thumb;
+    }
+
+    public void setSeries(List<String> series)
+    {
+	this.series = series;
+    }
+    
+    public void setStatus(String status)
+    {
+	this.status = status;
+    }
+
+    public void setArtists(List<DiscogsArtist> artists)
+    {
+	this.artists = artists;
+    }
+
+    public void setVideos(List<DiscogsVideo> videos)
+    {
+	this.videos = videos;
+    }
+
+    public void setYear(short year)
+    {
+	this.year = year;
     }
 
     public void setCountry(String country)
@@ -137,40 +326,35 @@ public class DiscogsRelease extends DiscogsMasterRelease
     {
 	this.notes = notes;
     }
-
-    public void setSubmitter(DiscogsUser submitter)
-    {
-	this.submitter = submitter;
-    }
-
-    public void setContributors(DiscogsUser[] contributors)
-    {
-	this.contributors = contributors;
-    }
     
-    public void setLabels(DiscogsLabel[] labels)
+    public void setLabels(List<DiscogsLabel> labels)
     {
 	this.labels = labels;
     }
 
-    public void setCompanies(DiscogsLabel[] companies)
+    public void setCompanies(List<DiscogsLabel> companies)
     {
 	this.companies = companies;
     }
 
-    public void setExtraArtists(DiscogsArtist[] extraartists)
+    public void setExtraArtists(List<DiscogsArtist> extraartists)
     {
 	this.extraartists = extraartists;
     }
 
-    public void setFormats(DiscogsFormat[] formats)
+    public void setFormats(List<DiscogsFormat> formats)
     {
 	this.formats = formats;
     }
 
-    public void setIdentifiers(DiscogsIdentifier[] identifiers)
+    public void setIdentifiers(List<DiscogsIdentifier> identifiers)
     {
 	this.identifiers = identifiers;
+    }
+
+    public void setDataQuality(String data_quality)
+    {
+	this.data_quality = data_quality;
     }
 
     public String toString()
@@ -178,28 +362,33 @@ public class DiscogsRelease extends DiscogsMasterRelease
 	StringBuilder builder = new StringBuilder("############Discogs Release############");
 	builder.append("Id: ").append(getId()).append("\n")
 	    .append("Title: ").append(getTitle()).append("\n")
+	    .append("Master id: ").append(getMasterId()).append("\n")
+	    .append("Master url: ").append(getMasterUrl()).append("\n")
 	    .append("ResourceUrl: ").append(getResourceUrl()).append("\n")
 	    .append("Uri: ").append(getUri()).append("\n")
 	    .append("Status: ").append(getStatus()).append("\n")
 	    .append("DataQuality: ").append(getDataQuality()).append("\n")
-	    .append("MasterId: ").append(getMasterId()).append("\n")
+	    .append("Series: ").append(StringUtils.join(getSeries(),',')).append("\n")
 	    .append("Country: ").append(getCountry()).append("\n")
 	    .append("Year: ").append(getYear()).append("\n")
 	    .append("Released: ").append(getReleased()).append("\n")
 	    .append("ReleasedFormatted: ").append(getReleasedFormatted()).append("\n")
+	    .append("Date added: ").append(getDateAdded()).append("\n")
+	    .append("Date Changed: ").append(getDateChanged()).append("\n")
+	    .append("Estimated Weight: ").append(getEstimatedWeight()).append("\n")
 	    .append("Notes: ").append(getNotes()).append("\n")
 	    .append("Community: \n").append(getCommunity()).append("\n")
-	    .append("Submitter: ").append(getSubmitter()).append("\n")
-	    .append("Contributors: \n").append(StringUtils.join(getContributors(), "\n")).append("\n")
 	    .append("Styles: ").append(StringUtils.join(getStyles(),',')).append("\n")
 	    .append("Genres: ").append(StringUtils.join(getGenres(),',')).append("\n")
 	    .append("Labels: \n").append(StringUtils.join(getLabels(),"\n")).append("\n")
 	    .append("Companies: \n").append(StringUtils.join(getCompanies(), "\n")).append("\n")
 	    .append("ExtraArtists: \n").append(StringUtils.join(getExtraArtists(), "\n")).append("\n")
 	    .append("Identifiers: \n").append(StringUtils.join(getIdentifiers(), "\n")).append("\n")
+	    .append("Format Quantity: ").append(getFormatQuantity()).append("\n")
 	    .append("Formats: \n").append(StringUtils.join(getFormats(), "\n")).append("\n")
 	    .append("Artists: \n").append(StringUtils.join(getArtists(), "\n")).append("\n")
 	    .append("Images: \n").append(StringUtils.join(getImages(), "\n")).append("\n")
+	    .append("Thumb: \n").append(getThumb()).append("\n")
 	    .append("Tracklist: \n").append(StringUtils.join(getTracklist(), "\n")).append("\n")
 	    .append("#############################");
 	
@@ -208,14 +397,14 @@ public class DiscogsRelease extends DiscogsMasterRelease
 
     public class DiscogsFormat
     {
-	private String[] descriptions;
+	private List<String> descriptions;
 	private String name;
 	private short qty;
 	
 	public DiscogsFormat()
 	{}
 
-	public String[] getDescriptions()
+	public List<String> getDescriptions()
 	{
 	    return this.descriptions;
 	}
@@ -230,7 +419,7 @@ public class DiscogsRelease extends DiscogsMasterRelease
 	    return this.qty;
 	}
 
-	public void setDescriptions(String[] descriptions)
+	public void setDescriptions(List<String> descriptions)
 	{
 	    this.descriptions = descriptions;
 	}
@@ -259,10 +448,24 @@ public class DiscogsRelease extends DiscogsMasterRelease
     {
 	private int have;
 	private int want;
+	private DiscogsUser submitter;
+	private List<DiscogsUser> contributors;
+	private String status;
 	private DiscogsRating rating;
+	private String data_quality;
 
 	public DiscogsCommunity()
 	{}
+
+	public String getDataQuality()
+	{
+	    return this.data_quality;
+	}
+
+	public String getStatus()
+	{
+	    return this.status;
+	}
 
 	public int getHave()
 	{
@@ -274,9 +477,29 @@ public class DiscogsRelease extends DiscogsMasterRelease
 	    return this.want;
 	}
 
+	public DiscogsUser getSubmitter()
+	{
+	    return this.submitter;
+	}
+
+	public List<DiscogsUser> getContributors()
+	{
+	    return this.contributors;
+	}
+
 	public DiscogsRating getRating()
 	{
 	    return this.rating;
+	}
+
+	public void setDataQuality(String data_quality)
+	{
+	    this.data_quality = data_quality;
+	}
+
+	public void setStatus(String status)
+	{
+	    this.status = status;
 	}
 
 	public void setHave(int have)
@@ -294,12 +517,26 @@ public class DiscogsRelease extends DiscogsMasterRelease
 	    this.rating = rating;
 	}
 
+	public void setSubmitter(DiscogsUser submitter)
+	{
+	    this.submitter = submitter;
+	}
+
+	public void setContributors(List<DiscogsUser> contributors)
+	{
+	    this.contributors = contributors;
+	}
+
 	public String toString()
 	{
 	    StringBuilder builder = new StringBuilder("Have :");
 	    builder.append(getHave()).append("\n")
 		.append("Want: ").append(getWant()).append("\n")
-		.append("Rating: ").append(getRating());
+		.append("Rating: ").append(getRating()).append("\n")
+		.append("Status: ").append(getStatus()).append("\n")
+		.append("Contributors: ").append(StringUtils.join(getContributors(), "\n"))
+		.append("Submitter: ").append(getSubmitter()).append("\n")
+		.append("Data Quality: ").append(getDataQuality());
 	    
 	    return builder.toString();
 	}

@@ -21,6 +21,8 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Array;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -34,14 +36,12 @@ public class DiscogsCoreTest
     private static DiscogsRelease testRelease = null;
     private static DiscogsMasterRelease testMaster= null;
     private static DiscogsUser testUser = null;
-    private static DiscogsImage testImage = null;
 
-    private static final int ARTIST_ID = 1;
-    private static final int LABEL_ID = 1;
-    private static final int RELEASE_ID = 1;
-    private static final int MASTER_ID = 257;
+    private static final long ARTIST_ID = 1;
+    private static final long LABEL_ID = 1;
+    private static final long RELEASE_ID = 1;
+    private static final long MASTER_ID = 257;
     private static final String USER_NAME = "1";
-    private static final String IMAGE_NAME = "1";
 
     @Test
     public void testGetArtist()
@@ -118,22 +118,8 @@ public class DiscogsCoreTest
 	    fail("Exception: " + e);
 	}
     }
-
-    @Ignore("Not implemented yet")
-    @Test
-    public void testGetImage()
-    {
-	try
-        {
-	    DiscogsImage image = serv.getImage(IMAGE_NAME);
-	}
-	catch(Exception e)
-        {
-	    fail("Exception: " + e);
-	}
-    }
-
-    @BeforeClass
+ 
+   @BeforeClass
     public static void testInit()
     {
 	try
@@ -149,7 +135,6 @@ public class DiscogsCoreTest
 	    testMaster= getTestEntity("master257.json", DiscogsMasterRelease.class);
 	    // http://api.discogs.com/users/1
 	    testUser = getTestEntity("user1.json", DiscogsUser.class);
-	    //this.test_image = getTestEntity("image1.json", DiscogsImage.class);
 	}
 	catch(InstantiationException | IllegalAccessException | IOException e)
 	{
@@ -210,35 +195,19 @@ public class DiscogsCoreTest
 		String exampleResultStr = "";
 		String testResultStr = "";
 
-		if(returnType.isArray()) 
+		if(List.class.isAssignableFrom(returnType)) 
 		{
-		    int exampleResultLength = Array.getLength(exampleResult);
-		    int testResultLength = Array.getLength(testResult);
+		    List exampleResultList = (List) exampleResult;
+		    List testResultList = (List) testResult;
 
-		    if(exampleResultLength != testResultLength)
+		    if(exampleResultList.size() != testResultList.size())
 		    {
-			exampleResultStr = "bla";
-			testResultStr = "blabla";
+			exampleResultStr = "example size: " + exampleResultList.size();
+			testResultStr = "test size: " + testResultList.size();
 		    }
 		    else
 		    {
-			Class elementType = returnType.getComponentType();
-			StringBuilder exampleJoined = new StringBuilder();
-			StringBuilder testJoined = new StringBuilder();
-			for(int j = 0; j < exampleResultLength; j++)
-			{
-			    Object exampleElement = Array.get(exampleResult, j);
-			    Object testElement = Array.get(testResult, j);
-			    
-			    if(exampleElement != null)
-				exampleJoined.append(elementType.cast(exampleElement));
-			    
-			    if(testElement != null)
-				testJoined.append(elementType.cast(testElement));
-
-			}
-			exampleResultStr = exampleJoined.toString(); 
-			testResultStr = testJoined.toString();
+			//TODO: check list elements
 		    }
 		}
 		else

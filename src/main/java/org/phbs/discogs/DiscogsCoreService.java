@@ -20,141 +20,135 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.io.IOUtils;
+
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreProtocolPNames;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpEntity;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
+public class DiscogsCoreService {
 
-public class DiscogsCoreService
-{
     //TODO: support discogs API limit properties
-    private Map<String, String> api_limits;
-    private DefaultHttpClient default_client;
-    protected Properties properties;
+    private Map<String, String> apiLimits;
+    private CloseableHttpClient defaultClient;
+    private Properties properties;
     protected Gson gson;
 
-    private static final Logger log = Logger.getLogger(DiscogsCoreService.class);
+    private static final Logger LOG = LogManager.getLogger(DiscogsCoreService.class);
 
-    public DiscogsCoreService()
-    {
-	this.gson = new Gson();
-	
-	log.info("Loading properties...");
-	loadProperties();
-
-	this.default_client = new DefaultHttpClient();
-	this.default_client.getParams().setParameter(CoreProtocolPNames.USER_AGENT, DiscogsCommons.USER_AGENT);
+    public DiscogsCoreService() {
+	this(null);
     }
 
-    public DiscogsCoreService(Properties properties)
-    {
+    public DiscogsCoreService(Properties properties) {
 	this.gson = new Gson();
-	this.properties = properties;
-	this.default_client = new DefaultHttpClient();
-	this.default_client.getParams().setParameter(CoreProtocolPNames.USER_AGENT, DiscogsCommons.USER_AGENT);
-	
+	loadProperties(properties);
+	this.defaultClient =  HttpClients.createDefault();
     }
 
-    private void loadProperties()
-    {
-	this.properties = new Properties();
-	try(FileReader reader = new FileReader(DiscogsCommons.PROP_FILE_NAME);
-	    Reader buffReader = new BufferedReader(reader);)
-        {
-	    properties.load(buffReader);
-        }
-        catch(IOException e)
-       {
-	   if(log.isInfoEnabled())
-	       log.info("Unable to load properties from " + 
-			DiscogsCommons.PROP_FILE_NAME + ". Set defaults.");
+    private void loadProperties(Properties properties) {
+	if(properties != null) {
+	    
+	    LOG.info("Use custom properties.");
+	    this.properties = properties;
 
-	   this.properties.setProperty(DiscogsCommons.SEARCH_URL, 
+	} else {
+
+	    this.properties = new Properties();
+
+	    try(FileReader reader = new FileReader(DiscogsCommons.PROP_FILE_NAME);
+		Reader buffReader = new BufferedReader(reader);) {
+
+		    properties.load(buffReader);
+
+	    } catch(IOException e) {
+
+		LOG.info("Unable to load properties from {}. Set defaults.", 
+			 DiscogsCommons.PROP_FILE_NAME);
+
+		this.properties.setProperty(DiscogsCommons.SEARCH_URL, 
                                "http://api.discogs.com/database/search");
-	   this.properties.setProperty(DiscogsCommons.ARTIST_URL, 
+		this.properties.setProperty(DiscogsCommons.ARTIST_URL, 
                                "http://api.discogs.com/artists/");
-	   this.properties.setProperty(DiscogsCommons.RELEASE_URL, 
+		this.properties.setProperty(DiscogsCommons.RELEASE_URL, 
                                "http://api.discogs.com/releases/");
-	   this.properties.setProperty(DiscogsCommons.MASTER_URL, 
+		this.properties.setProperty(DiscogsCommons.MASTER_URL, 
                                "http://api.discogs.com/masters/");
-	   this.properties.setProperty(DiscogsCommons.LABEL_URL,
+		this.properties.setProperty(DiscogsCommons.LABEL_URL,
                                 "http://api.discogs.com/labels/");
-	   this.properties.setProperty(DiscogsCommons.IMAGE_URL,
+		this.properties.setProperty(DiscogsCommons.IMAGE_URL,
                                 "http://api.discogs.com/images/");
-   	   this.properties.setProperty(DiscogsCommons.USER_URL, 
+		this.properties.setProperty(DiscogsCommons.USER_URL, 
                                 "http://api.discogs.com/users/");
-       }
+	    }
+	}
     }
 
     protected <T extends DiscogsEntity> T getEntity(String id, Class<T> type)
-	    throws DiscogsApiException
-    {
+	    throws DiscogsApiException {
+
 	T entity = null;
 
-	if(log.isDebugEnabled())
-	    log.debug("Try to send request to " + getEndpoint(type));
+	LOG.debug("Try to send request to {}", getEndpoint(type));
 
-	try(InputStream stream = sendRequest(getEndpoint(type) + id, null);
-	    Reader inReader = new BufferedReader(new InputStreamReader(stream));)
-        {
+	try(InputStream stream = sendGetRequest(getEndpoint(type) + id, null);
+	    Reader inReader = new BufferedReader(new InputStreamReader(stream));) {
+
 	    entity = this.gson.fromJson(inReader, type);
-	}
-	catch(IOException e)
-        {
+
+	} catch(IOException e) {
 	    throw new DiscogsApiException("Error during sending request. ",e);
 	}
 
-	if(log.isDebugEnabled())
-	    log.debug("get entity: " + entity.getClass().getName() + " \n" + entity);
+	LOG.debug("Get entity: {}\n{}", entity.getClass().getName(), entity);
 
 	return entity;
     }
 
-    protected InputStream sendRequest(String destination, Map<String, String> parameters)
-	    throws DiscogsApiException
-    {
-	try
-	{
-	    log.info("Send Default request.");
-	    URIBuilder builder = new URIBuilder(destination);
+    protected InputStream sendGetRequest(String destination, Map<String, String> parameters)
+	    throws DiscogsApiException {
+
+	LOG.info("Send Default request.");
+		
+	URIBuilder builder = null;
+	HttpGet httpget = null;
+	
+	try {
+	    builder = new URIBuilder(destination);
 	    
-	    if(parameters != null && !parameters.isEmpty())
-	    {
-		for(String key : parameters.keySet())
-		{
+	    if(parameters != null)
+		for(String key : parameters.keySet()) {
 		    if(key == null) continue;
 		    if(parameters.get(key) == null) continue;
-		    builder.setParameter(key, parameters.get(key));
+		    builder.addParameter(key, parameters.get(key));
 		}
-	    }
+
 	    URI uri = builder.build();
-	    HttpGet httpget = new HttpGet(uri);
-	    HttpResponse response = this.default_client.execute(httpget);
+	    httpget = new HttpGet(uri);
+	    httpget.setHeader("User-Agent", DiscogsCommons.USER_AGENT);
 
-	    DiscogsCommons.validateResponse(response.getStatusLine().getStatusCode());
+	    CloseableHttpResponse response = this.defaultClient.execute(httpget);
 
-	    HttpEntity entity = response.getEntity();
+    	    DiscogsCommons.validateResponse(response.getStatusLine().getStatusCode());
 	    
-	    return entity.getContent();
-	}
-	catch(IOException | URISyntaxException e)
-	{
+	    return response.getEntity().getContent();
+
+
+	} catch (URISyntaxException e) {
+	    throw new DiscogsApiException("Bad API urls", e);
+	} catch(IOException e) {
 	    throw new DiscogsApiException("Error occured while sending request", e);
 	}
     }
 
-    protected <T> String getEndpoint(Class<T> type)
-    {
-	if(log.isDebugEnabled())
-	    log.debug("Find endpoint by type " + type.getSimpleName());
+    protected <T> String getEndpoint(Class<T> type) {
 
-	switch(type.getSimpleName())
-	{
+	LOG.debug("Find endpoint by type {}", type.getSimpleName());
+
+	switch(type.getSimpleName()) {
 	    case "DiscogsArtist":
 		return this.properties.getProperty(DiscogsCommons.ARTIST_URL);
 	    case "DiscogsRelease":
@@ -174,8 +168,7 @@ public class DiscogsCoreService
 	return StringUtils.EMPTY;
     }
 
-    public Map<String, String> getAPILimits()
-    {
-	return this.api_limits;
+    public Map<String, String> getAPILimits() {
+	return this.apiLimits;
     }
 }

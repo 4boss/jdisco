@@ -28,14 +28,14 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Core Functionality tests
  */
-public class DiscogsCoreTest
-{
-    private static DiscogsService serv = null;
-    private static DiscogsArtist testArtist = null;
+public class DiscogsCoreTest {
+
+    private static DiscogsReadOnlyService serv = null;
+    /*private static DiscogsArtist testArtist = null;
     private static DiscogsLabel testLabel = null;
     private static DiscogsRelease testRelease = null;
     private static DiscogsMasterRelease testMaster= null;
-    private static DiscogsUser testUser = null;
+    private static DiscogsUser testUser = null;*/
 
     private static final long ARTIST_ID = 1;
     private static final long LABEL_ID = 1;
@@ -44,87 +44,61 @@ public class DiscogsCoreTest
     private static final String USER_NAME = "1";
 
     @Test
-    public void testGetArtist()
-    {
-	try
-        {
+    public void testGetArtist() {
+	try {
 	    DiscogsArtist artist = serv.getArtist(ARTIST_ID);
-	    String result = compareFields(artist, testArtist);
-	    assertNull(result, result);
+	    assertNotNull(artist);
 	    
-	}
-	catch(Exception e)
-        {
+	} catch(Exception e) {
 	    fail("Exception: " + e);
 	}
     }
 
     @Test
-    public void testGetLabel()
-    {
-	try
-        {
+    public void testGetLabel() {
+	try {
 	    DiscogsLabel label = serv.getLabel(LABEL_ID);
-	    String result = compareFields(label, testLabel);
-	    assertNull(result, result);
-	}
-	catch(Exception e)
-        {
+	    assertNotNull(label);
+	} catch(Exception e) {
 	    fail("Exception: " + e);
 	}
     }
 
     @Test
-    public void testGetRelease()
-    {
-        try
-        {
+    public void testGetRelease() {
+        try {
 	    DiscogsRelease release = serv.getRelease(RELEASE_ID);
-    	    String result = compareFields(release, testRelease);
-	    assertNull(result, result);
-	}
-	catch(Exception e)
-        {
+	    assertNotNull(release);
+	} catch(Exception e) {
 	    fail("Exception: " + e);
 	}
     }
 
     @Test
-    public void testGetMasterRelease()
-    {
-	try
-        {
+    public void testGetMasterRelease() {
+	try {
 	    DiscogsMasterRelease master = serv.getMaster(MASTER_ID);
-    	    String result = compareFields(master, testMaster);
-	    assertNull(result, result);
-	}
-	catch(Exception e)
-        {
+	    assertNotNull(master);
+	} catch(Exception e) {
 	    fail("Exception: " + e);
 	}
     }
     
     @Test
-    public void testGetUser()
-    {
-	try
-        {
+    public void testGetUser() {
+	try {
 	    DiscogsUser user = serv.getUser(USER_NAME);
-	    String result = compareFields(user, testUser);
-	    assertNull(result, result);
-	}
-	catch(Exception e)
-        {
+	    assertNotNull(user);
+	} catch(Exception e) {
 	    fail("Exception: " + e);
 	}
     }
  
    @BeforeClass
-    public static void testInit()
-    {
-	try
-	{
-	    serv = new DiscogsService();
+    public static void testInit() {
+
+	    serv = new DiscogsReadOnlyService();
+	    /*
 	    // http://api.discogs.com/artists/1
 	    testArtist = getTestEntity("artist1.json", DiscogsArtist.class);
 	    // http://api.discogs.com/labels/1
@@ -134,12 +108,8 @@ public class DiscogsCoreTest
 	    // http://api.discogs.com/masters/257
 	    testMaster= getTestEntity("master257.json", DiscogsMasterRelease.class);
 	    // http://api.discogs.com/users/1
-	    testUser = getTestEntity("user1.json", DiscogsUser.class);
-	}
-	catch(InstantiationException | IllegalAccessException | IOException e)
-	{
-	    fail("Exception" + e);
-	}
+	    testUser = getTestEntity("user1.json", DiscogsUser.class);*/
+
     }
 
     private static <T extends DiscogsEntity>T getTestEntity(String fileName, Class<T> type) 

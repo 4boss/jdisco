@@ -11,23 +11,23 @@ import org.phbs.discogs.exceptions.*;
 import org.phbs.discogs.pojo.*;
 import java.io.*;
 import java.lang.reflect.Type;
-import org.apache.http.params.CoreProtocolPNames;
 import org.apache.commons.lang.StringUtils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.google.gson.reflect.TypeToken;
 
 public class DiscogsOAuthService extends DiscogsCoreService {
 
-    private String auth_url;
-    private Token access_token;
-    private Token request_token;
-    private OAuthService oa_service;
-    private String oauth_init_error;
+    private String authUrl;
+    private Token accessToken;
+    private Token requestToken;
+    private OAuthService oaService;
+    private String oauthInitError;
     private DiscogsKeysProxy keyProxy;
 
-    private static final Logger log = Logger.getLogger(DiscogsOAuthService.class);
+    private static final Logger LOG = LogManager.getLogger(DiscogsOAuthService.class);
 
     public DiscogsOAuthService(DiscogsKeysProxy keyProxy) {
 	super();
@@ -37,69 +37,56 @@ public class DiscogsOAuthService extends DiscogsCoreService {
 
     private void initOAuth(DiscogsKeysProxy keyProxy)
     {
-	log.info("Preauthorization...");
-	try
-	{
-	    if(this.oa_service == null)
-	    {
-		    this.oa_service = new ServiceBuilder().provider(DiscoApiEnvelope.class)
+	LOG.info("Preauthorization...");
+	try {
+	    this.oaService = new ServiceBuilder().provider(DiscoApiEnvelope.class)
 			                                  .apiKey(keyProxy.getConsumerKey())
 			                                  .apiSecret(keyProxy.getSecretKey())
                                                           .build();
 
-		    this.request_token = this.oa_service.getRequestToken();
-		    this.auth_url = this.oa_service.getAuthorizationUrl(this.request_token);
-	    }
-	}
-	catch(OAuthException e)
-	{
-	    log.error(e);
-	    this.oauth_init_error = e.getMessage();
+	    this.requestToken = this.oaService.getRequestToken();
+	    this.authUrl = this.oaService.getAuthorizationUrl(this.requestToken);
+	} catch(OAuthException e) {
+	    LOG.error(e);
+	    this.oauthInitError = e.getMessage();
 	}
 
-	if(log.isInfoEnabled())
-	    log.info("Auth URL:" + getAuthURL());
+	LOG.info("Auth URL: {}", getAuthURL());
     }
 
-    public String getOuathInitErrorMessage()
-    {
-	return this.oauth_init_error;
+    public String getOuathInitErrorMessage() {
+	return this.oauthInitError;
     }
 
-    public void authorize(String sequence)
-    {
+    public void authorize(String sequence) {
 	Verifier verifier = new Verifier(sequence);
-	this.access_token = this.oa_service.getAccessToken(this.request_token, verifier);
+	this.accessToken = this.oaService.getAccessToken(this.requestToken, verifier);
     }
 
-    public String getAuthURL()
-    {
-	return this.auth_url;
+    public String getAuthURL() {
+	return this.authUrl;
     }
 
-    public boolean isAuthorized()
-    {
-	return access_token != null;
+    public boolean isAuthorized() {
+	return accessToken != null;
     }
 
-    protected InputStream sendRequest(String destination, Map<String, String> parameters)
-	throws DiscogsApiException 
-    {
-	log.info("send OAuth request.");
+    protected InputStream sendGetRequest(String destination, Map<String, String> parameters)
+	throws DiscogsApiException {
+
+	LOG.info("send OAuth request.");
 	
 	OAuthRequest request = new OAuthRequest(Verb.GET, destination);
-	request.addHeader(CoreProtocolPNames.USER_AGENT, DiscogsCommons.USER_AGENT);
-	if(parameters != null && !parameters.isEmpty())
-	{
-	    for(String key : parameters.keySet())
-	    {
+	request.addHeader("User-Agent", DiscogsCommons.USER_AGENT);
+	if(parameters != null && !parameters.isEmpty()) {
+	    for(String key : parameters.keySet()) {
 		if(key == null) continue;
 		if(parameters.get(key) == null) continue;
 		request.addQuerystringParameter(key, parameters.get(key));
 	    }
 	}
 	
-	this.oa_service.signRequest(this.access_token, request);
+	this.oaService.signRequest(this.accessToken, request);
 	Response response = request.send();
 
 	DiscogsCommons.validateResponse(response.getCode());
@@ -108,25 +95,23 @@ public class DiscogsOAuthService extends DiscogsCoreService {
     }
 
     private <T extends DiscogsEntity> List<T> findEntity(Map<String, String> parameters, Class<T> type, Type typeToken)
-	throws DiscogsApiException
-    {
+	throws DiscogsApiException {
+
 	DiscogsSearchResult<T> result = null;
-	try(InputStream stream = sendRequest(getEndpoint(DiscogsSearchResult.class), parameters);
-	    Reader inReader = new BufferedReader(new InputStreamReader(stream));)
-        {
+	try(InputStream stream = sendGetRequest(getEndpoint(DiscogsSearchResult.class), parameters);
+	    Reader inReader = new BufferedReader(new InputStreamReader(stream));) {
+
 	    result = this.gson.fromJson(inReader, typeToken);
-	}
-	catch(IOException e)
-        {
-	    throw new DiscogsApiException("Error during sending request. ",e);
+
+	} catch(IOException e) {
+	    throw new DiscogsApiException("Error during sending request. ", e);
 	}
 	
 	List<T> resultList = Collections.emptyList();
 	if(result.getResults() != null)
 	    resultList = result.getResults();
 
-	if(log.isDebugEnabled())
-	{
+	if(LOG.isDebugEnabled()) {
 	    StringBuilder logResults = new StringBuilder("Found ");
 	    logResults.append(resultList.size())
 		.append(" entities ")
@@ -134,19 +119,17 @@ public class DiscogsOAuthService extends DiscogsCoreService {
 		.append(" by params:\n")
 		.append(StringUtils.join(parameters.entrySet(), "\n"))
 		.append("Results: \n");
-	    for(T entity : resultList)
-	    {
+	    for(T entity : resultList) {
 		logResults.append(entity.toString()).append("\n");
 	    }
 
-	    log.debug(logResults.toString());
+	    LOG.debug(logResults.toString());
 	}
 
 	return resultList;
     }
 
-    public List<DiscogsArtist> findArtists(String name) throws DiscogsApiException
-    {
+    public List<DiscogsArtist> findArtists(String name) throws DiscogsApiException {
 	Map<String, String> params = new HashMap<>();
 	params.put("type", "artist");
 	params.put("title", name);
@@ -154,8 +137,7 @@ public class DiscogsOAuthService extends DiscogsCoreService {
 	return findEntity(params, DiscogsArtist.class, typeToken.getType());
     }
 
-    public List<DiscogsRelease> findReleases(String name) throws DiscogsApiException
-    {
+    public List<DiscogsRelease> findReleases(String name) throws DiscogsApiException {
 	Map<String, String> params = new HashMap<>();
 	params.put("type", "release");
 	params.put("title", name);
@@ -163,8 +145,7 @@ public class DiscogsOAuthService extends DiscogsCoreService {
 	return findEntity(params, DiscogsRelease.class, typeToken.getType());
     }
 
-    public List<DiscogsLabel> findLabels(String name) throws DiscogsApiException
-    {
+    public List<DiscogsLabel> findLabels(String name) throws DiscogsApiException {
 	Map<String, String> params = new HashMap<>();
 	params.put("type", "label");
 	params.put("title", name);
@@ -172,14 +153,12 @@ public class DiscogsOAuthService extends DiscogsCoreService {
 	return findEntity(params, DiscogsLabel.class, typeToken.getType());
     }
 
-    public DiscogsImage getImage(String name) throws DiscogsApiException
-    {
+    public DiscogsImage getImage(String name) throws DiscogsApiException {
 	//TODO impl
 	return null;
     }
 
-    public DiscogsImage getImage(DiscogsImage image) throws DiscogsApiException
-    {
+    public DiscogsImage getImage(DiscogsImage image) throws DiscogsApiException {
 	//TODO IMPL
 	return image;
     }
